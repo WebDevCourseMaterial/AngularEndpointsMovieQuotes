@@ -1,0 +1,9 @@
+# Generated files
+*.discovery
+*.pyc
+*.zip
+
+#Eclipse
+.project
+.pydevproject
+.settings
