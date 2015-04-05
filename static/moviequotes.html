@@ -12,7 +12,7 @@
   <link href="/static/stylesheets/moviequotes.css" rel="stylesheet">
 
 </head>
-<body ng-controller="MovieQuotesCtrl as moviequotes">
+<body ng-controller="MovieQuotesCtrl">
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
       <div class="navbar-header">
@@ -55,7 +55,7 @@
           </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="moviequote in moviequotes.items">
+            <tr ng-repeat="moviequote in items">
               <td>{{moviequote.quote}}</td>
               <td>{{moviequote.movie}}</td>
               <td class="hidden edit-actions">
