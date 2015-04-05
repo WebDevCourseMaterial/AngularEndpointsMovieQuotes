@@ -9,11 +9,13 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+# Endpoints
 - url: /_ah/spi/.*
   script: api.app
 
+# Serve the primary html page.
 - url: (.*)/
-  static_files: static\1/moviequotes.html
+  static_files: static/moviequotes.html
   upload: static
   secure: always
 

@@ -3,7 +3,7 @@ init = function() {
   var apiRoot = '//' + window.location.host + '/_ah/api';
   var callback = function() {
     if (--apisToLoad == 0) {
-      // bootstrap angularjs manually AFTER our Endpoints api is loaded and a query has run.
+      // Bootstrap AngularJS manually AFTER our Endpoints API has been loaded.
       angular.bootstrap(document, [ "App" ]);
     }
   }

@@ -3,8 +3,6 @@ var app = angular.module("App", [ "ui.bootstrap" ]);
 app.controller("MovieQuotesCtrl", function($scope) {
   $scope.items = [];
 
-
-
   $scope.listMovieQuotes = function (limit, pageToken) {
     var bindResult = function(movieQuoteCollection) {
         $scope.items = movieQuoteCollection.items || [];
