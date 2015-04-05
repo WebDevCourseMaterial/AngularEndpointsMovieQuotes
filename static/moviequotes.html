@@ -35,8 +35,11 @@
       <!--/.nav-collapse -->
     </div>
   </div>
+
   <div class="container">
-  <pre class="status" ng-bind="status">Loading Endpoints...</pre>
+    <pre class="status" ng-bind="status">Loading Endpoints...</pre>
+  </div>
+  <div class="container hidden">
     <div class="table-wrapper">
       <table class="table table-striped">
         <thead>
@@ -63,7 +66,6 @@
                 </button>
               </td>
             </tr>
-          {% endfor %}
         </tbody>
       </table>
     </div>

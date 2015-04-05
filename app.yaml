@@ -10,12 +10,12 @@ handlers:
   upload: favicon\.ico
 
 - url: /_ah/spi/.*
-  script: api.py
+  script: api.app
 
-#- url: (.*)/
-#  static_files: static\1/moviequotes.html
-#  upload: static
-#  secure: always
+- url: (.*)/
+  static_files: static\1/moviequotes.html
+  upload: static
+  secure: always
 
 # Serving static files (js, css, images, etc)
 - url: /static
