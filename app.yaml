@@ -12,15 +12,14 @@ handlers:
 - url: /_ah/spi/.*
   script: api.py
 
-- url: (.*)/
-  static_files: static\1/index.html
-  upload: static
-  secure: always
+#- url: (.*)/
+#  static_files: static\1/moviequotes.html
+#  upload: static
+#  secure: always
 
 # Serving static files (js, css, images, etc)
 - url: /static
   static_dir: static
-  secure: always
 
 libraries:
 - name: endpoints

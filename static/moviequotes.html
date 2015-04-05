@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MovieQuotes</title>
-<!-- Bootstrap core CSS -->
-<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="/static/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-<!-- Custom styles -->
-<link href="/static/stylesheets/moviequotes.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MovieQuotes</title>
+
+  <!-- Bootstrap core CSS as instructed by http://angular-ui.github.io/bootstrap/ -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+  <!-- Custom styles -->
+  <link href="/static/stylesheets/moviequotes.css" rel="stylesheet">
 
 </head>
-<body>
+<body ng-controller="MovieQuotesCtrl as moviequotes">
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
       <div class="navbar-header">
@@ -35,6 +36,7 @@
     </div>
   </div>
   <div class="container">
+  <pre class="status" ng-bind="status">Loading Endpoints...</pre>
     <div class="table-wrapper">
       <table class="table table-striped">
         <thead>
@@ -45,8 +47,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for moviequote in moviequotes_query %}
-            <tr>
+            <tr ng-repeat="moviequote in moviequotes.items">
               <td>{{moviequote.quote}}</td>
               <td>{{moviequote.movie}}</td>
               <td class="hidden edit-actions">
@@ -137,19 +138,16 @@
   <!-- Bootstrap core JavaScript
     ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+  <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.js"></script>
 
   <!-- Angular Endpoints -->
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.js"></script>
   <script src="/static/js/base.js"></script>
   <script src="/static/js/app.js"></script>
   <script src="/static/js/controllers.js"></script>
-  <script src="/static/js/services.js"></script>
   <!-- Endpoints Library, call the init function when it's done loading -->
   <script src="https://apis.google.com/js/client.js?onload=init"></script>
 
-  <script src="/static/js/moviequotes.js"></script>
 
 </body>
 </html>

@@ -1,7 +1,9 @@
 import endpoints
-import protorpc
+from google.appengine.ext import ndb
 from models import MovieQuote
-import main_bootstrap
+import protorpc
+
+PARENT_KEY = ndb.Key("Entity", 'moviequotes_root')
 
 @endpoints.api(name="moviequotes", version="v1", description="Movie Quotes API")
 class MovieQuotesApi(protorpc.remote.Service):
@@ -13,7 +15,7 @@ class MovieQuotesApi(protorpc.remote.Service):
         if request.from_datastore:
             my_quote = request
         else:
-            my_quote = MovieQuote(parent=main_bootstrap.PARENT_KEY, quote=request.quote, movie=request.movie)
+            my_quote = MovieQuote(parent=PARENT_KEY, quote=request.quote, movie=request.movie)
         my_quote.put()
         return my_quote
 
