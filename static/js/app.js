@@ -74,9 +74,8 @@ app.controller("InsertQuoteModalCtrl", function ($scope, $modalInstance, $timeou
     movieQuoteInModal.movie = $scope.movieValue;
     gapi.client.moviequotes.moviequote.insert(movieQuoteInModal).execute(function (resp) {
       if (!resp.code) {
-        console.log("Old time = " + movieQuoteInModal.last_touch_date_time);
+        // Update the fields that the server modified when the MovieQuote was put into the Datastore.
         movieQuoteInModal.last_touch_date_time = resp.last_touch_date_time;
-        console.log("New time = " + movieQuoteInModal.last_touch_date_time);
         movieQuoteInModal.entityKey = resp.entityKey;
       }
     });
