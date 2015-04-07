@@ -14,9 +14,13 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
       }
     });
     modalInstance.result.then(function (movieQuoteFromModal) {
-      if (movieQuoteFromRow == null) {
-        $scope.items.unshift(movieQuoteFromModal);
+      if (movieQuoteFromRow != null) {
+        var index = $scope.items.indexOf(movieQuoteFromModal);
+        if (index > -1) {
+          $scope.items.splice(index, 1);
+        }
       }
+      $scope.items.unshift(movieQuoteFromModal);
       $scope.isEditing = false;
     });
   };
