@@ -3,13 +3,21 @@ var app = angular.module("App", [ "ui.bootstrap" ]);
 app.controller("MovieQuotesCtrl", function($scope, $modal) {
   $scope.items = [];
 
-  $scope.showInsertQuoteDialog = function (size) {
+  $scope.showInsertQuoteDialog = function (movieQuoteFromRow) {
       var modalInstance = $modal.open({
         templateUrl: "/static/partials/insertQuoteModal.html",
-        controller: 'InsertQuoteModalCtrl'
+        controller: "InsertQuoteModalCtrl",
+        resolve: {
+            movieQuoteInModal: function () {
+              return movieQuoteFromRow;
+            }
+        }
       });
-      modalInstance.result.then(function (movieQuote) {
-          $scope.items.unshift(movieQuote);
+      modalInstance.result.then(function (movieQuoteFromModal) {
+        if (movieQuoteFromRow == null) {
+          $scope.items.unshift(movieQuoteFromModal);
+        }
+        $scope.isEditing = false;
       });
     };
 
@@ -42,24 +50,30 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
 });
 
 
-app.controller("InsertQuoteModalCtrl", function ($rootScope, $scope, $modalInstance) {
+/* ### Modal Controllers ### */
+
+app.controller("InsertQuoteModalCtrl", function ($scope, $modalInstance, $timeout, movieQuoteInModal) {
+  $scope.isNewQuote = movieQuoteInModal == undefined;
+  $scope.movieQuote = movieQuoteInModal;
   $scope.insertQuote = function () {
-    var movieQuote = {
-            "quote": $scope.quote,
-            "movie": $scope.movie,
-            "entityKey": $scope.entityKey
-          };
-    gapi.client.moviequotes.moviequote.insert(movieQuote).execute(function (resp) {
+    gapi.client.moviequotes.moviequote.insert($scope.movieQuote).execute(function (resp) {
       if (!resp.code) {
-        movieQuote.entityKey = resp.entityKey;
+        $scope.movieQuote.entityKey = resp.entityKey;
       }
     });
-    $modalInstance.close(movieQuote);
+    $modalInstance.close($scope.movieQuote);
   };
 
   $scope.cancel = function () {
      $modalInstance.dismiss("cancel");
   };
+
+  $modalInstance.opened.then(function() {
+    $timeout(function() {
+      // Note the opened promise is still too early.  Added a 100mS delay to give Chrome time to put the DOM in place.
+      document.querySelector("#quote-input").focus();
+    }, 100);
+  });
 });
 
 app.run(function() {

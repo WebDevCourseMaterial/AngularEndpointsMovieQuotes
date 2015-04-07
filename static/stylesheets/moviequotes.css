@@ -10,7 +10,8 @@ body {
   align-items: center;
 }
 
-#loading-message .progress {
+#loading-message .progress,
+#loading-message .progress-bar {
   width: 100%;
 }
 
@@ -26,4 +27,9 @@ body {
 
 th {
   font-size: 1.5em;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  width: 70px;
 }

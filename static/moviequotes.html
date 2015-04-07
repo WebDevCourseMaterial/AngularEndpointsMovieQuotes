@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MovieQuotes</title>
 
-  <!-- Bootstrap core CSS as instructed by http://angular-ui.github.io/bootstrap/ -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
-  <!-- Custom styles -->
-  <link href="/static/stylesheets/moviequotes.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/stylesheets/moviequotes.css">
+
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+  <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.js"></script>
+  <script src="/static/js/base.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="https://apis.google.com/js/client.js?onload=init"></script>
 
 </head>
 <body ng-controller="MovieQuotesCtrl">
@@ -26,18 +30,19 @@
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-left hidden">
-          <li><a id="add-quote" ng-click="showInsertQuoteDialog()" href="#">Add Quote</a></li>
+          <li><a ng-click="showInsertQuoteDialog()" href="#">Add Quote</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right hidden">
-          <li><a id="toggle-edit" href="#">Edit</a></li>
+          <li><a ng-model="isEditing" btn-checkbox href="#">{{isEditing ? "Done" : "Edit"}}</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
     </div>
   </div>
+
   <div id="loading-message" class="container">
     <div class="progress">
-      <div class="progress-bar progress-bar-striped active" role="progressbar" style="width: 100%">
+      <div class="progress-bar progress-bar-striped active" role="progressbar">
       Loading...
         <span class="sr-only">Loading...</span>
       </div>
@@ -51,70 +56,26 @@
           <tr>
             <th>Quote</th>
             <th>Movie</th>
-            <th class="hidden edit-actions">Edits</th>
+            <th ng-show="isEditing">Edits</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="moviequote in items">
             <td>{{moviequote.quote}}</td>
             <td>{{moviequote.movie}}</td>
-            <td class="hidden edit-actions">
-              <button data-toggle="modal" data-target="#insert-quote-modal" type="button" class="edit-movie-quote btn btn-xs btn-success">
+            <td ng-show="isEditing" class="edit-actions">
+              <button ng-click="showInsertQuoteDialog(moviequote)" type="button" class="btn btn-xs btn-success">
                 <span class="glyphicon glyphicon-pencil"></span>
-                <div class="hidden entity-key">{{ moviequote.entityKey }}</div>
-                <div class="hidden quote">{{moviequote.quote}}</div>
-                <div class="hidden movie">{{moviequote.movie}}</div>
               </button>
-              <button data-toggle="modal" data-target="#delete-quote-modal" type="button" class="delete-movie-quote btn btn-xs btn-danger">
-                <span class="glyphicon glyphicon-remove"></span>
-                <div class="hidden entity-key">{{ moviequote.entityKey }}</div>
+              <button ng-click="showDeleteQuoteDialog(moviequote)" type="button" class="btn btn-xs btn-danger">
+                <span class="glyphicon glyphicon-trash"></span>
               </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
-
-
-  <!-- Modal -->
-  <div id='delete-quote-modal' class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Delete MovieQuote" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">Delete MovieQuote</h4>
-        </div>
-        <form class="form-horizontal" action="/deletequote" method="POST">
-          <input type="hidden" name="entity_key">
-          <div class="modal-body">
-            <div>Are you sure you wish to delete this quote?</div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-danger">Delete quote</button>
-          </div>
-        </form>
-      </div>
-      <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
   </div>
-  <!-- /.modal -->
 
-
-  </div>
-  <!-- /.container -->
-  <!-- Bootstrap core JavaScript
-    ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
-  <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.js"></script>
-
-  <!-- Angular Endpoints -->
-  <script src="/static/js/base.js"></script>
-  <script src="/static/js/app.js"></script>
-  <!-- Endpoints Library, call the init function when it's done loading -->
-  <script src="https://apis.google.com/js/client.js?onload=init"></script>
 </body>
 </html>
