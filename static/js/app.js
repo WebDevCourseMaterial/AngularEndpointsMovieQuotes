@@ -4,22 +4,41 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
   $scope.items = [];
 
   $scope.showInsertQuoteDialog = function (movieQuoteFromRow) {
-      var modalInstance = $modal.open({
-        templateUrl: "/static/partials/insertQuoteModal.html",
-        controller: "InsertQuoteModalCtrl",
-        resolve: {
-            movieQuoteInModal: function () {
-              return movieQuoteFromRow;
-            }
-        }
-      });
-      modalInstance.result.then(function (movieQuoteFromModal) {
-        if (movieQuoteFromRow == null) {
-          $scope.items.unshift(movieQuoteFromModal);
-        }
-        $scope.isEditing = false;
-      });
-    };
+    var modalInstance = $modal.open({
+      templateUrl: "/static/partials/insertQuoteModal.html",
+      controller: "InsertQuoteModalCtrl",
+      resolve: {
+          movieQuoteInModal: function () {
+            return movieQuoteFromRow;
+          }
+      }
+    });
+    modalInstance.result.then(function (movieQuoteFromModal) {
+      if (movieQuoteFromRow == null) {
+        $scope.items.unshift(movieQuoteFromModal);
+      }
+      $scope.isEditing = false;
+    });
+  };
+
+  $scope.showDeleteQuoteDialog = function (movieQuoteFromRow) {
+    var modalInstance = $modal.open({
+      templateUrl: "/static/partials/deleteQuoteModal.html",
+      controller: "DeleteQuoteModalCtrl",
+      resolve: {
+          movieQuoteInModal: function () {
+            return movieQuoteFromRow;
+          }
+      }
+    });
+    modalInstance.result.then(function (movieQuoteFromModal) {
+      var index = $scope.items.indexOf(movieQuoteFromModal);
+      if (index > -1) {
+        $scope.items.splice(index, 1);
+      }
+      $scope.isEditing = false;
+    });
+  };
 
   $scope.listMovieQuotes = function (limit, pageToken) {
     var bindResult = function(movieQuoteCollection) {
@@ -34,17 +53,6 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
     });
   };
 
-
-  $scope.deleteMovieQuote = function (movieQuoteId) {
-    gapi.client.moviequotes.moviequote.delete({
-      "id": movieQuoteId
-    }).execute(function (resp) {
-        if (!resp.code) {
-          console.log("Deleting now remove from DOM");
-        }
-      });
-  };
-
   // Make the initial backend request.
   $scope.listMovieQuotes(10);
 });
@@ -53,15 +61,26 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
 /* ### Modal Controllers ### */
 
 app.controller("InsertQuoteModalCtrl", function ($scope, $modalInstance, $timeout, movieQuoteInModal) {
-  $scope.isNewQuote = movieQuoteInModal == undefined;
-  $scope.movieQuote = movieQuoteInModal;
+  if (movieQuoteInModal == undefined) {
+    $scope.isNewQuote = true;
+  } else {
+    $scope.quoteValue = movieQuoteInModal.quote;
+    $scope.movieValue = movieQuoteInModal.movie;
+  }
+
   $scope.insertQuote = function () {
-    gapi.client.moviequotes.moviequote.insert($scope.movieQuote).execute(function (resp) {
+    movieQuoteInModal = movieQuoteInModal || {};
+    movieQuoteInModal.quote = $scope.quoteValue;
+    movieQuoteInModal.movie = $scope.movieValue;
+    gapi.client.moviequotes.moviequote.insert(movieQuoteInModal).execute(function (resp) {
       if (!resp.code) {
-        $scope.movieQuote.entityKey = resp.entityKey;
+        console.log("Old time = " + movieQuoteInModal.last_touch_date_time);
+        movieQuoteInModal.last_touch_date_time = resp.last_touch_date_time;
+        console.log("New time = " + movieQuoteInModal.last_touch_date_time);
+        movieQuoteInModal.entityKey = resp.entityKey;
       }
     });
-    $modalInstance.close($scope.movieQuote);
+    $modalInstance.close(movieQuoteInModal);
   };
 
   $scope.cancel = function () {
@@ -74,6 +93,23 @@ app.controller("InsertQuoteModalCtrl", function ($scope, $modalInstance, $timeou
       document.querySelector("#quote-input").focus();
     }, 100);
   });
+});
+
+app.controller("DeleteQuoteModalCtrl", function ($scope, $modalInstance, movieQuoteInModal) {
+  $scope.movieQuote = movieQuoteInModal;
+  $scope.deleteQuote = function () {
+    console.log("Deleting quote");
+    gapi.client.moviequotes.moviequote.delete({"entityKey": movieQuoteInModal.entityKey}).execute(function (resp) {
+      if (!resp.code) {
+        console.log("Delete MovieQuote on backend as well.");
+      }
+    });
+    $modalInstance.close($scope.movieQuote);
+  };
+
+  $scope.cancel = function () {
+     $modalInstance.dismiss("cancel");
+  };
 });
 
 app.run(function() {
