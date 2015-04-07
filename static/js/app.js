@@ -1,7 +1,17 @@
 var app = angular.module("App", [ "ui.bootstrap" ]);
 
-app.controller("MovieQuotesCtrl", function($scope) {
+app.controller("MovieQuotesCtrl", function($scope, $modal) {
   $scope.items = [];
+
+  $scope.showInsertQuoteDialog = function (size) {
+      var modalInstance = $modal.open({
+        templateUrl: "/static/partials/insertQuoteModal.html",
+        controller: 'InsertQuoteModalCtrl'
+      });
+      modalInstance.result.then(function (movieQuote) {
+          $scope.items.unshift(movieQuote);
+      });
+    };
 
   $scope.listMovieQuotes = function (limit, pageToken) {
     var bindResult = function(movieQuoteCollection) {
@@ -16,21 +26,10 @@ app.controller("MovieQuotesCtrl", function($scope) {
     });
   };
 
-  $scope.insertMovieQuote = function (movieTitle, quote) {
-    // TODO: Add the movie quote right now, then fire the Endpoints call.
-    var postJson = {
-        'movie_title': movieTitle,
-        'quote': quote
-      };
-      gapi.client.moviequotes.quote.insert(postJson).execute(function (resp) {
-        if (!resp.code) {
-        }
-      });
-    };
 
   $scope.deleteMovieQuote = function (movieQuoteId) {
-    gapi.client.moviequotes.quote.delete({
-      'id': movieQuoteId
+    gapi.client.moviequotes.moviequote.delete({
+      "id": movieQuoteId
     }).execute(function (resp) {
         if (!resp.code) {
           console.log("Deleting now remove from DOM");
@@ -40,6 +39,27 @@ app.controller("MovieQuotesCtrl", function($scope) {
 
   // Make the initial backend request.
   $scope.listMovieQuotes(10);
+});
+
+
+app.controller("InsertQuoteModalCtrl", function ($rootScope, $scope, $modalInstance) {
+  $scope.insertQuote = function () {
+    var movieQuote = {
+            "quote": $scope.quote,
+            "movie": $scope.movie,
+            "entityKey": $scope.entityKey
+          };
+    gapi.client.moviequotes.moviequote.insert(movieQuote).execute(function (resp) {
+      if (!resp.code) {
+        movieQuote.entityKey = resp.entityKey;
+      }
+    });
+    $modalInstance.close(movieQuote);
+  };
+
+  $scope.cancel = function () {
+     $modalInstance.dismiss("cancel");
+  };
 });
 
 app.run(function() {
