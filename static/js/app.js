@@ -44,12 +44,16 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
     });
   };
 
-  $scope.listMovieQuotes = function (limit, pageToken) {
+  $scope.listMovieQuotes = function (pageToken, limit) {
     var bindResult = function(movieQuoteCollection) {
-        $scope.items = movieQuoteCollection.items || [];
-        $scope.$apply();
-      };
-    gapi.client.moviequotes.moviequote.list({"order": "-last_touch_date_time", "limit": limit}).execute(
+      $scope.items.push.apply($scope.items, movieQuoteCollection.items || []);
+      $scope.pageToken = movieQuoteCollection.nextPageToken;
+      $scope.$apply();
+    };
+    limit = limit || 40;
+    pageToken = pageToken || null;
+    var queryParameters = {"order": "-last_touch_date_time", "limit": limit, "pageToken": pageToken};
+    gapi.client.moviequotes.moviequote.list(queryParameters).execute(
       function (resp) {
         if (!resp.code) {
           bindResult(resp);
@@ -58,7 +62,17 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
   };
 
   // Make the initial backend request.
-  $scope.listMovieQuotes(10);
+  $scope.listMovieQuotes();
+
+  // Check to see if more quotes need to be loaded.
+  window.addEventListener("scroll", function(ev) {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+      if ($scope.pageToken) {
+        $scope.listMovieQuotes($scope.pageToken);
+      }
+    }
+  });
+
 });
 
 
