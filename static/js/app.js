@@ -1,74 +1,80 @@
 var app = angular.module("App", [ "ui.bootstrap" ]);
 
 app.controller("MovieQuotesCtrl", function($scope, $modal) {
-  $scope.items = [];
+  this.items = [];
+  this.DEFAULT_LIMIT = 40;
 
-  $scope.showInsertQuoteDialog = function (movieQuoteFromRow) {
+  this.showInsertQuoteDialog = function(movieQuoteFromRow) {
     var modalInstance = $modal.open({
       templateUrl: "/static/partials/insertQuoteModal.html",
       controller: "InsertQuoteModalCtrl",
+      controllerAs: "insertModal",
       resolve: {
           movieQuoteInModal: function () {
             return movieQuoteFromRow;
           }
       }
     });
-    modalInstance.result.then(function (movieQuoteFromModal) {
+    var movieQuotesCtrl = this;
+    modalInstance.result.then(function(movieQuoteFromModal) {
       if (movieQuoteFromRow != null) {
-        var index = $scope.items.indexOf(movieQuoteFromModal);
+        var index = movieQuotesCtrl.items.indexOf(movieQuoteFromModal);
         if (index > -1) {
-          $scope.items.splice(index, 1);
+          movieQuotesCtrl.items.splice(index, 1);
         }
       }
-      $scope.items.unshift(movieQuoteFromModal);
-      $scope.isEditing = false;
+      movieQuotesCtrl.items.unshift(movieQuoteFromModal);
+      movieQuotesCtrl.isEditing = false;
     });
   };
 
-  $scope.showDeleteQuoteDialog = function (movieQuoteFromRow) {
+
+  this.showDeleteQuoteDialog = function(movieQuoteFromRow) {
     var modalInstance = $modal.open({
       templateUrl: "/static/partials/deleteQuoteModal.html",
       controller: "DeleteQuoteModalCtrl",
+      controllerAs: "deleteModal",
       resolve: {
           movieQuoteInModal: function () {
             return movieQuoteFromRow;
           }
       }
     });
+    var movieQuotesCtrl = this;
     modalInstance.result.then(function (movieQuoteFromModal) {
-      var index = $scope.items.indexOf(movieQuoteFromModal);
+      var index = movieQuotesCtrl.items.indexOf(movieQuoteFromModal);
       if (index > -1) {
-        $scope.items.splice(index, 1);
+        movieQuotesCtrl.items.splice(index, 1);
       }
-      $scope.isEditing = false;
+      movieQuotesCtrl.isEditing = false;
     });
   };
 
-  $scope.listMovieQuotes = function (pageToken, limit) {
-    var bindResult = function(movieQuoteCollection) {
-      $scope.items.push.apply($scope.items, movieQuoteCollection.items || []);
-      $scope.pageToken = movieQuoteCollection.nextPageToken;
-      $scope.$apply();
-    };
-    limit = limit || 40;
-    pageToken = pageToken || null;
-    var queryParameters = {"order": "-last_touch_date_time", "limit": limit, "pageToken": pageToken};
+
+  this.listMovieQuotes = function(pageToken, limit) {
+    var movieQuotesCtrl = this;
+    var queryParameters = {"order": "-last_touch_date_time",
+                           "limit": limit || this.DEFAULT_LIMIT,
+                           "pageToken": pageToken || null};
     gapi.client.moviequotes.moviequote.list(queryParameters).execute(
       function (resp) {
         if (!resp.code) {
-          bindResult(resp);
+          movieQuotesCtrl.items.push.apply(movieQuotesCtrl.items, resp.items || []);
+          movieQuotesCtrl.pageToken = resp.nextPageToken;
+          $scope.$apply();
         }
     });
   };
 
   // Make the initial backend request.
-  $scope.listMovieQuotes();
+  this.listMovieQuotes();
 
   // Check to see if more quotes need to be loaded.
+  var movieQuotesCtrl = this;
   window.addEventListener("scroll", function(ev) {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-      if ($scope.pageToken) {
-        $scope.listMovieQuotes($scope.pageToken);
+      if (movieQuotesCtrl.pageToken) {
+        movieQuotesCtrl.listMovieQuotes(movieQuotesCtrl.pageToken);
       }
     }
   });
@@ -78,18 +84,15 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
 
 /* ### Modal Controllers ### */
 
-app.controller("InsertQuoteModalCtrl", function ($scope, $modalInstance, $timeout, movieQuoteInModal) {
-  if (movieQuoteInModal == undefined) {
-    $scope.isNewQuote = true;
-  } else {
-    $scope.quoteValue = movieQuoteInModal.quote;
-    $scope.movieValue = movieQuoteInModal.movie;
-  }
+app.controller("InsertQuoteModalCtrl", function ($modalInstance, $timeout, movieQuoteInModal) {
+  this.isNewQuote = movieQuoteInModal == undefined;
+  this.quoteValue = movieQuoteInModal.quote || "";
+  this.movieValue = movieQuoteInModal.movie || "";
 
-  $scope.insertQuote = function () {
+  this.insertQuote = function () {
     movieQuoteInModal = movieQuoteInModal || {};
-    movieQuoteInModal.quote = $scope.quoteValue;
-    movieQuoteInModal.movie = $scope.movieValue;
+    movieQuoteInModal.quote = this.quoteValue;
+    movieQuoteInModal.movie = this.movieValue;
     gapi.client.moviequotes.moviequote.insert(movieQuoteInModal).execute(function (resp) {
       if (!resp.code) {
         // Update the fields that the server modified when the MovieQuote was put into the Datastore.
@@ -100,7 +103,7 @@ app.controller("InsertQuoteModalCtrl", function ($scope, $modalInstance, $timeou
     $modalInstance.close(movieQuoteInModal);
   };
 
-  $scope.cancel = function () {
+  this.cancel = function () {
      $modalInstance.dismiss("cancel");
   };
 
@@ -112,24 +115,25 @@ app.controller("InsertQuoteModalCtrl", function ($scope, $modalInstance, $timeou
   });
 });
 
-app.controller("DeleteQuoteModalCtrl", function ($scope, $modalInstance, movieQuoteInModal) {
-  $scope.movieQuote = movieQuoteInModal;
-  $scope.deleteQuote = function () {
-    console.log("Deleting quote");
+
+app.controller("DeleteQuoteModalCtrl", function ($modalInstance, movieQuoteInModal) {
+  this.deleteQuote = function () {
     gapi.client.moviequotes.moviequote.delete({"entityKey": movieQuoteInModal.entityKey}).execute(function (resp) {
       if (!resp.code) {
-        console.log("Delete MovieQuote on backend as well.");
+        console.log("Deleted MovieQuote on backend as well.");
       }
     });
-    $modalInstance.close($scope.movieQuote);
+    $modalInstance.close(movieQuoteInModal);
   };
 
-  $scope.cancel = function () {
+  this.cancel = function () {
      $modalInstance.dismiss("cancel");
   };
 });
 
+
 app.run(function() {
+  // Using simple jQuery commands to hide the Loading message container and show the real page.
   angular.element(document.querySelector(".hidden.container")).removeClass("hidden");
   angular.element(document.querySelectorAll(".hidden.nav.navbar-nav")).removeClass("hidden");
   angular.element(document.querySelector("#loading-message")).addClass("hidden");
