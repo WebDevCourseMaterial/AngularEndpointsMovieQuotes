@@ -1,4 +1,4 @@
-var app = angular.module("App", [ "ui.bootstrap" ]);
+var app = angular.module("app", [ "ui.bootstrap" ]);
 
 app.controller("MovieQuotesCtrl", function($scope, $modal) {
   this.items = [];
@@ -86,11 +86,11 @@ app.controller("MovieQuotesCtrl", function($scope, $modal) {
 
 app.controller("InsertQuoteModalCtrl", function ($modalInstance, $timeout, movieQuoteInModal) {
   this.isNewQuote = movieQuoteInModal == undefined;
+  movieQuoteInModal = movieQuoteInModal || {};
   this.quoteValue = movieQuoteInModal.quote || "";
   this.movieValue = movieQuoteInModal.movie || "";
 
   this.insertQuote = function () {
-    movieQuoteInModal = movieQuoteInModal || {};
     movieQuoteInModal.quote = this.quoteValue;
     movieQuoteInModal.movie = this.movieValue;
     gapi.client.moviequotes.moviequote.insert(movieQuoteInModal).execute(function (resp) {
