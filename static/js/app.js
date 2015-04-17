@@ -3,8 +3,10 @@ var app = angular.module("app", [ "ui.bootstrap" ]);
 app.controller("MovieQuotesCtrl", function($scope, $modal) {
   this.items = [];
   this.DEFAULT_LIMIT = 40;
+  this.navbarCollapsed = true;
 
   this.showInsertQuoteDialog = function(movieQuoteFromRow) {
+    this.navbarCollapsed = true;
     var modalInstance = $modal.open({
       templateUrl: "/static/partials/insertQuoteModal.html",
       controller: "InsertQuoteModalCtrl",

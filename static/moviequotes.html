@@ -14,13 +14,12 @@
   <script src="/static/js/base.js"></script>
   <script src="/static/js/app.js"></script>
   <script src="https://apis.google.com/js/client.js?onload=init"></script>
-
 </head>
 <body ng-controller="MovieQuotesCtrl as moviequotes">
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <button type="button" class="navbar-toggle" ng-click="moviequotes.navbarCollapsed = !moviequotes.navbarCollapsed">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
@@ -28,12 +27,12 @@
         </button>
         <a class="navbar-brand" href="#">MovieQuotes</a>
       </div>
-      <div class="collapse navbar-collapse">
+      <div collapse="moviequotes.navbarCollapsed" class="navbar-collapse">
         <ul class="nav navbar-nav navbar-left hidden">
           <li><a ng-click="moviequotes.showInsertQuoteDialog()" href="#">Add Quote</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right hidden">
-          <li><a ng-model="moviequotes.isEditing" btn-checkbox href="#">{{moviequotes.isEditing ? "Done" : "Edit"}}</a></li>
+          <li><a ng-model="moviequotes.isEditing" ng-click="moviequotes.navbarCollapsed = true" btn-checkbox href="#">{{moviequotes.isEditing ? "Done" : "Edit"}}</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
